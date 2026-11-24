@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   Cpu,
   Database,
@@ -8,11 +8,7 @@ import {
   ShieldCheck,
   ChevronDown,
   Sparkles,
-  Zap,
-  Activity,
   CheckCircle2,
-  TrendingDown,
-  Server,
 } from "lucide-react";
 
 interface ShowcaseSlide {
@@ -23,8 +19,8 @@ interface ShowcaseSlide {
   subtitle: string;
   description: string;
   icon: React.ElementType;
-  color: string;
   accentBg: string;
+  accentGlow: string;
   techs: string[];
   points: string[];
   visualStats: {
@@ -44,8 +40,8 @@ const SLIDES: ShowcaseSlide[] = [
     description:
       "Arsitektur terdistribusi non-blocking dengan komunikasi antar-service berlatensi sub-milidetik, didukung pemrosesan antrean pesan asynchronous untuk beban transaksi skala besar.",
     icon: Cpu,
-    color: "from-emerald-500 to-teal-400",
     accentBg: "bg-emerald-500/10 border-emerald-500/30 text-emerald-500",
+    accentGlow: "rgba(16, 185, 129, 0.2)",
     techs: ["Golang (Gin)", "Node.js", "gRPC", "RabbitMQ", "WebSockets", "Docker"],
     points: [
       "Komunikasi RPC efisien & serialisasi protobuf super cepat",
@@ -67,8 +63,8 @@ const SLIDES: ShowcaseSlide[] = [
     description:
       "Investigasi mendalam EXPLAIN ANALYZE untuk mengeliminasi Sequential Scan pada tabel jutaan baris, menerapkan composite indexing, dan arsitektur Redis caching.",
     icon: Database,
-    color: "from-blue-500 to-cyan-400",
     accentBg: "bg-blue-500/10 border-blue-500/30 text-blue-500",
+    accentGlow: "rgba(59, 130, 246, 0.2)",
     techs: ["PostgreSQL", "MySQL", "Redis", "EXPLAIN ANALYZE", "Prisma", "Gorm"],
     points: [
       "Penurunan latensi kueri berat hingga 97% pada beban transaksi puncak",
@@ -90,8 +86,8 @@ const SLIDES: ShowcaseSlide[] = [
     description:
       "Pengembangan fitur baru dan implementasi Change Requests (CR) alur distribusi spare parts otomotif, menjaga kontinuitas bisnis tanpa mengganggu operasional ribuan pengguna harian.",
     icon: Layers,
-    color: "from-amber-500 to-orange-400",
     accentBg: "bg-amber-500/10 border-amber-500/30 text-amber-500",
+    accentGlow: "rgba(245, 158, 11, 0.2)",
     techs: ["Next.js 14", "TypeScript", "Enterprise ERP", "Astra Ecosystem", "Incident SLA"],
     points: [
       "Eksekusi Change Request cepat dengan uji kompatibilitas backward ketat",
@@ -113,8 +109,8 @@ const SLIDES: ShowcaseSlide[] = [
     description:
       "Pipeline pengujian end-to-end otomatis menggunakan Playwright untuk menjamin zero-defect deployments, dikombinasikan dengan manajemen server Linux dan deployment cloud GCP.",
     icon: ShieldCheck,
-    color: "from-purple-500 to-pink-400",
     accentBg: "bg-purple-500/10 border-purple-500/30 text-purple-500",
+    accentGlow: "rgba(168, 85, 247, 0.2)",
     techs: ["Google Cloud (GCP)", "Playwright E2E", "Linux OS", "Docker", "AWS S3", "CI/CD"],
     points: [
       "Automated Playwright regression testing mencegah regresi kode di produksi",
@@ -131,33 +127,86 @@ const SLIDES: ShowcaseSlide[] = [
 
 export function ParallaxShowcaseSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const progressPercentRef = useRef<HTMLSpanElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+
   const [activeIndex, setActiveIndex] = useState(0);
+  const activeIndexRef = useRef(0);
+  const isTickingRef = useRef(false);
+  const isInViewRef = useRef(false);
+
+  // Performance-optimized scroll calculation via requestAnimationFrame
+  const updateScroll = useCallback(() => {
+    isTickingRef.current = false;
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const totalScrollable = rect.height - windowHeight;
+
+    if (totalScrollable <= 0) return;
+
+    const currentScroll = -rect.top;
+    const progress = Math.min(Math.max(currentScroll / totalScrollable, 0), 1);
+
+    // 1. Direct GPU-accelerated update for progress bar (zero React re-render lag)
+    if (progressBarRef.current) {
+      progressBarRef.current.style.transform = `scaleX(${progress})`;
+    }
+    if (progressPercentRef.current) {
+      progressPercentRef.current.textContent = `${Math.round(progress * 100)}%`;
+    }
+
+    // 2. Determine active slide and ONLY trigger React re-render when slide changes
+    const segment = 1 / SLIDES.length;
+    const nextIndex = Math.min(Math.floor(progress / segment), SLIDES.length - 1);
+
+    if (nextIndex !== activeIndexRef.current) {
+      activeIndexRef.current = nextIndex;
+      setActiveIndex(nextIndex);
+
+      // Smooth glow color change without expensive blur recalculations
+      if (glowRef.current) {
+        glowRef.current.style.backgroundColor = SLIDES[nextIndex].accentGlow;
+      }
+    }
+  }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const totalScrollable = rect.height - windowHeight;
+    // Only listen to scroll when section is in or near viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isInViewRef.current = entry.isIntersecting;
+          if (entry.isIntersecting) {
+            updateScroll();
+          }
+        });
+      },
+      { rootMargin: "200px 0px" }
+    );
 
-      if (totalScrollable <= 0) return;
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
 
-      // Current scrolled distance relative to container top
-      const currentScroll = -rect.top;
-      const progress = Math.min(Math.max(currentScroll / totalScrollable, 0), 1);
-      setScrollProgress(progress);
-
-      // Determine active slide based on 4 segments
-      const segment = 1 / SLIDES.length;
-      const index = Math.min(Math.floor(progress / segment), SLIDES.length - 1);
-      setActiveIndex(index);
+    const onScroll = () => {
+      if (!isInViewRef.current) return;
+      if (!isTickingRef.current) {
+        isTickingRef.current = true;
+        window.requestAnimationFrame(updateScroll);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateScroll();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [updateScroll]);
 
   const jumpToSlide = (index: number) => {
     if (!containerRef.current) return;
@@ -165,7 +214,8 @@ export function ParallaxShowcaseSection() {
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const containerTop = rect.top + scrollTop;
     const totalScrollable = rect.height - window.innerHeight;
-    const targetScroll = containerTop + (index / (SLIDES.length - 1)) * totalScrollable;
+    const targetScroll =
+      containerTop + (index / (SLIDES.length - 1)) * totalScrollable;
 
     window.scrollTo({
       top: targetScroll,
@@ -173,38 +223,23 @@ export function ParallaxShowcaseSection() {
     });
   };
 
-  const currentSlide = SLIDES[activeIndex];
-  const CurrentIcon = currentSlide.icon;
-
   return (
     <section
       id="architecture-showcase"
       ref={containerRef}
-      className="relative w-full h-[360vh] border-b border-border/40"
+      className="relative w-full h-[320vh] border-b border-border/40 will-change-transform"
     >
-      {/* Pinned Sticky Stage - Stays locked on screen while scrolling */}
-      <div className="sticky top-16 md:top-20 h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full flex flex-col justify-between overflow-hidden bg-background/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-6 select-none">
-        {/* Background Ambient Mesh & Spotlight */}
+      {/* Pinned Sticky Stage - Hardware Accelerated & Zero Jank */}
+      <div className="sticky top-16 md:top-20 h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full flex flex-col justify-between overflow-hidden bg-background/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-6 select-none transform-gpu">
+        {/* Static Hardware-Accelerated Ambient Glow (Replaces heavy dynamic blur transforms) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-40 dark:opacity-25"
+          className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-40 dark:opacity-25 overflow-hidden"
         >
           <div
-            className="w-[500px] h-[500px] rounded-full blur-3xl transition-all duration-700"
-            style={{
-              background: `radial-gradient(circle, ${
-                activeIndex === 0
-                  ? "#10b981"
-                  : activeIndex === 1
-                  ? "#3b82f6"
-                  : activeIndex === 2
-                  ? "#f59e0b"
-                  : "#a855f7"
-              } 0%, transparent 70%)`,
-              transform: `scale(${1 + scrollProgress * 0.4}) rotate(${
-                scrollProgress * 90
-              }deg)`,
-            }}
+            ref={glowRef}
+            className="w-[450px] h-[450px] rounded-full blur-3xl transition-colors duration-500 ease-out"
+            style={{ backgroundColor: SLIDES[activeIndex].accentGlow }}
           />
         </div>
 
@@ -213,7 +248,7 @@ export function ParallaxShowcaseSection() {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <Sparkles className="h-3 w-3 animate-pulse" />
+                <Sparkles className="h-3 w-3" />
                 <span>Parallax Presentation Mode</span>
               </span>
               <span className="text-[11px] font-medium text-muted-foreground hidden sm:inline">
@@ -232,7 +267,7 @@ export function ParallaxShowcaseSection() {
                 key={slide.id}
                 type="button"
                 onClick={() => jumpToSlide(idx)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all duration-300 ${
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-200 ${
                   activeIndex === idx
                     ? "bg-card text-foreground shadow-xs border border-border/80 scale-105"
                     : "text-muted-foreground hover:text-foreground"
@@ -245,46 +280,28 @@ export function ParallaxShowcaseSection() {
           </div>
         </div>
 
-        {/* Main Pinned Card Display (Parallax Stacking Illusion) */}
+        {/* Main Pinned Card Display (Hardware Accelerated 3D Slide Deck) */}
         <div className="relative z-10 container mx-auto max-w-5xl flex-1 flex items-center justify-center py-4 my-auto">
-          <div className="w-full relative">
+          <div className="w-full relative h-[420px] sm:h-[380px] md:h-[360px]">
             {SLIDES.map((slide, idx) => {
               const Icon = slide.icon;
               const isActive = activeIndex === idx;
               const isPast = activeIndex > idx;
-              const isFuture = activeIndex < idx;
-
-              // Parallax 3D Stack Transformation
-              let transformStyle = "translateY(0px) scale(1)";
-              let opacity = "opacity-100";
-              let zIndex = 20;
-
-              if (isPast) {
-                // Stacked upward and scaled down
-                transformStyle = "translateY(-24px) scale(0.92)";
-                opacity = "opacity-0 pointer-events-none";
-                zIndex = 10;
-              } else if (isFuture) {
-                // Ready below
-                transformStyle = "translateY(36px) scale(0.94)";
-                opacity = "opacity-0 pointer-events-none";
-                zIndex = 5;
-              }
 
               return (
                 <div
                   key={slide.id}
-                  className={`transition-all duration-500 ease-out ${
-                    isActive ? "relative block" : "absolute inset-0"
-                  } ${opacity}`}
-                  style={{
-                    transform: isActive ? "translateY(0px) scale(1)" : transformStyle,
-                    zIndex,
-                  }}
+                  className={`absolute inset-0 transition-all duration-300 ease-out will-change-transform transform-gpu ${
+                    isActive
+                      ? "opacity-100 translate-y-0 scale-100 pointer-events-auto z-20"
+                      : isPast
+                      ? "opacity-0 -translate-y-6 scale-95 pointer-events-none z-10"
+                      : "opacity-0 translate-y-6 scale-95 pointer-events-none z-0"
+                  }`}
                 >
-                  <div className="rounded-3xl border border-border/70 bg-card/90 backdrop-blur-xl p-6 sm:p-8 md:p-10 shadow-2xl space-y-6">
+                  <div className="h-full flex flex-col justify-between rounded-3xl border border-border/70 bg-card/95 backdrop-blur-xl p-6 sm:p-8 md:p-9 shadow-xl space-y-4">
                     {/* Card Top Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/50 pb-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/50 pb-4">
                       <div className="flex items-center gap-3.5">
                         <div
                           className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-inner ${slide.accentBg}`}
@@ -316,7 +333,7 @@ export function ParallaxShowcaseSection() {
                     </div>
 
                     {/* Subtitle & Description */}
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       <h4 className="text-sm sm:text-base font-bold text-foreground">
                         {slide.subtitle}
                       </h4>
@@ -326,11 +343,11 @@ export function ParallaxShowcaseSection() {
                     </div>
 
                     {/* Key Technical Points */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1">
                       {slide.points.map((pt, pIdx) => (
                         <div
                           key={pIdx}
-                          className="flex items-start gap-2.5 p-3 rounded-xl border border-border/40 bg-muted/30"
+                          className="flex items-start gap-2 p-2.5 rounded-xl border border-border/40 bg-muted/30"
                         >
                           <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                           <span className="text-xs text-muted-foreground font-medium leading-relaxed">
@@ -341,14 +358,14 @@ export function ParallaxShowcaseSection() {
                     </div>
 
                     {/* Tech Badges */}
-                    <div className="pt-2 flex flex-wrap items-center gap-2">
+                    <div className="pt-2 flex flex-wrap items-center gap-1.5 border-t border-border/40">
                       <span className="text-[11px] font-bold text-muted-foreground uppercase mr-1">
                         Core Stack:
                       </span>
                       {slide.techs.map((tech) => (
                         <span
                           key={tech}
-                          className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-muted text-foreground border border-border/50"
+                          className="text-xs font-semibold px-2.5 py-0.5 rounded-lg bg-muted text-foreground border border-border/50"
                         >
                           {tech}
                         </span>
@@ -377,15 +394,19 @@ export function ParallaxShowcaseSection() {
             <ChevronDown className="h-4 w-4 animate-bounce text-emerald-500" />
           </div>
 
-          {/* Dynamic Progress Bar */}
+          {/* Dynamic Progress Bar (Hardware GPU Transform ScaleX) */}
           <div className="flex items-center gap-3">
-            <span className="text-[11px] font-mono font-bold">
-              {Math.round(scrollProgress * 100)}%
+            <span
+              ref={progressPercentRef}
+              className="text-[11px] font-mono font-bold w-9 text-right"
+            >
+              0%
             </span>
             <div className="w-24 sm:w-36 h-2 rounded-full bg-muted overflow-hidden border border-border/50">
               <div
-                className="h-full bg-emerald-500 transition-all duration-150 rounded-full"
-                style={{ width: `${scrollProgress * 100}%` }}
+                ref={progressBarRef}
+                className="h-full w-full bg-emerald-500 origin-left will-change-transform transform-gpu rounded-full"
+                style={{ transform: "scaleX(0)" }}
               />
             </div>
           </div>
