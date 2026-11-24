@@ -9,6 +9,10 @@ import {
   ChevronDown,
   Sparkles,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
 } from "lucide-react";
 
 interface ShowcaseSlide {
@@ -20,7 +24,7 @@ interface ShowcaseSlide {
   description: string;
   icon: React.ElementType;
   accentBg: string;
-  accentGlow: string;
+  badgeColor: string;
   techs: string[];
   points: string[];
   visualStats: {
@@ -41,7 +45,7 @@ const SLIDES: ShowcaseSlide[] = [
       "Arsitektur terdistribusi non-blocking dengan komunikasi antar-service berlatensi sub-milidetik, didukung pemrosesan antrean pesan asynchronous untuk beban transaksi skala besar.",
     icon: Cpu,
     accentBg: "bg-emerald-500/10 border-emerald-500/30 text-emerald-500",
-    accentGlow: "rgba(16, 185, 129, 0.2)",
+    badgeColor: "text-emerald-500 border-emerald-500/30 bg-emerald-500/10",
     techs: ["Golang (Gin)", "Node.js", "gRPC", "RabbitMQ", "WebSockets", "Docker"],
     points: [
       "Komunikasi RPC efisien & serialisasi protobuf super cepat",
@@ -64,7 +68,7 @@ const SLIDES: ShowcaseSlide[] = [
       "Investigasi mendalam EXPLAIN ANALYZE untuk mengeliminasi Sequential Scan pada tabel jutaan baris, menerapkan composite indexing, dan arsitektur Redis caching.",
     icon: Database,
     accentBg: "bg-blue-500/10 border-blue-500/30 text-blue-500",
-    accentGlow: "rgba(59, 130, 246, 0.2)",
+    badgeColor: "text-blue-500 border-blue-500/30 bg-blue-500/10",
     techs: ["PostgreSQL", "MySQL", "Redis", "EXPLAIN ANALYZE", "Prisma", "Gorm"],
     points: [
       "Penurunan latensi kueri berat hingga 97% pada beban transaksi puncak",
@@ -87,7 +91,7 @@ const SLIDES: ShowcaseSlide[] = [
       "Pengembangan fitur baru dan implementasi Change Requests (CR) alur distribusi spare parts otomotif, menjaga kontinuitas bisnis tanpa mengganggu operasional ribuan pengguna harian.",
     icon: Layers,
     accentBg: "bg-amber-500/10 border-amber-500/30 text-amber-500",
-    accentGlow: "rgba(245, 158, 11, 0.2)",
+    badgeColor: "text-amber-500 border-amber-500/30 bg-amber-500/10",
     techs: ["Next.js 14", "TypeScript", "Enterprise ERP", "Astra Ecosystem", "Incident SLA"],
     points: [
       "Eksekusi Change Request cepat dengan uji kompatibilitas backward ketat",
@@ -110,7 +114,7 @@ const SLIDES: ShowcaseSlide[] = [
       "Pipeline pengujian end-to-end otomatis menggunakan Playwright untuk menjamin zero-defect deployments, dikombinasikan dengan manajemen server Linux dan deployment cloud GCP.",
     icon: ShieldCheck,
     accentBg: "bg-purple-500/10 border-purple-500/30 text-purple-500",
-    accentGlow: "rgba(168, 85, 247, 0.2)",
+    badgeColor: "text-purple-500 border-purple-500/30 bg-purple-500/10",
     techs: ["Google Cloud (GCP)", "Playwright E2E", "Linux OS", "Docker", "AWS S3", "CI/CD"],
     points: [
       "Automated Playwright regression testing mencegah regresi kode di produksi",
@@ -129,15 +133,15 @@ export function ParallaxShowcaseSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const progressPercentRef = useRef<HTMLSpanElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIndexRef = useRef(0);
   const isTickingRef = useRef(false);
   const isInViewRef = useRef(false);
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
 
-  // Performance-optimized scroll calculation via requestAnimationFrame
-  const updateScroll = useCallback(() => {
+  // High-performance, zero-re-render scroll handler
+  const handleScrollProgress = useCallback(() => {
     isTickingRef.current = false;
     if (!containerRef.current) return;
 
@@ -150,7 +154,7 @@ export function ParallaxShowcaseSection() {
     const currentScroll = -rect.top;
     const progress = Math.min(Math.max(currentScroll / totalScrollable, 0), 1);
 
-    // 1. Direct GPU-accelerated update for progress bar (zero React re-render lag)
+    // Direct GPU scaleX update without React DOM reconciliation
     if (progressBarRef.current) {
       progressBarRef.current.style.transform = `scaleX(${progress})`;
     }
@@ -158,33 +162,28 @@ export function ParallaxShowcaseSection() {
       progressPercentRef.current.textContent = `${Math.round(progress * 100)}%`;
     }
 
-    // 2. Determine active slide and ONLY trigger React re-render when slide changes
+    // Determine slide index (0 to 3)
     const segment = 1 / SLIDES.length;
     const nextIndex = Math.min(Math.floor(progress / segment), SLIDES.length - 1);
 
     if (nextIndex !== activeIndexRef.current) {
       activeIndexRef.current = nextIndex;
       setActiveIndex(nextIndex);
-
-      // Smooth glow color change without expensive blur recalculations
-      if (glowRef.current) {
-        glowRef.current.style.backgroundColor = SLIDES[nextIndex].accentGlow;
-      }
     }
   }, []);
 
+  // IntersectionObserver to completely halt scroll work when offscreen
   useEffect(() => {
-    // Only listen to scroll when section is in or near viewport
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           isInViewRef.current = entry.isIntersecting;
           if (entry.isIntersecting) {
-            updateScroll();
+            handleScrollProgress();
           }
         });
       },
-      { rootMargin: "200px 0px" }
+      { rootMargin: "100px 0px" }
     );
 
     if (containerRef.current) {
@@ -195,56 +194,74 @@ export function ParallaxShowcaseSection() {
       if (!isInViewRef.current) return;
       if (!isTickingRef.current) {
         isTickingRef.current = true;
-        window.requestAnimationFrame(updateScroll);
+        window.requestAnimationFrame(handleScrollProgress);
       }
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    updateScroll();
+    handleScrollProgress();
 
     return () => {
       observer.disconnect();
       window.removeEventListener("scroll", onScroll);
     };
-  }, [updateScroll]);
+  }, [handleScrollProgress]);
 
-  const jumpToSlide = (index: number) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const containerTop = rect.top + scrollTop;
-    const totalScrollable = rect.height - window.innerHeight;
-    const targetScroll =
-      containerTop + (index / (SLIDES.length - 1)) * totalScrollable;
+  // Auto-play timer (optional user mode for effortless viewing)
+  useEffect(() => {
+    if (!isAutoPlay) return;
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % SLIDES.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [isAutoPlay]);
 
-    window.scrollTo({
-      top: targetScroll,
-      behavior: "smooth",
-    });
+  const goToSlide = (index: number) => {
+    setActiveIndex(index);
+    activeIndexRef.current = index;
+
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const containerTop = rect.top + scrollTop;
+      const totalScrollable = rect.height - window.innerHeight;
+      const targetScroll =
+        containerTop + (index / (SLIDES.length - 1)) * totalScrollable;
+
+      window.scrollTo({
+        top: targetScroll,
+        behavior: "smooth",
+      });
+    }
   };
+
+  const nextSlide = () => {
+    goToSlide((activeIndex + 1) % SLIDES.length);
+  };
+
+  const prevSlide = () => {
+    goToSlide((activeIndex - 1 + SLIDES.length) % SLIDES.length);
+  };
+
+  const currentSlide = SLIDES[activeIndex];
+  const CurrentIcon = currentSlide.icon;
 
   return (
     <section
       id="architecture-showcase"
       ref={containerRef}
-      className="relative w-full h-[320vh] border-b border-border/40 will-change-transform"
+      className="relative w-full h-[220vh] border-b border-border/40"
     >
-      {/* Pinned Sticky Stage - Hardware Accelerated & Zero Jank */}
-      <div className="sticky top-16 md:top-20 h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full flex flex-col justify-between overflow-hidden bg-background/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-6 select-none transform-gpu">
-        {/* Static Hardware-Accelerated Ambient Glow (Replaces heavy dynamic blur transforms) */}
+      {/* Pinned Sticky Stage - Clean Solid Backgrounds, Zero Filter Lag */}
+      <div className="sticky top-16 md:top-20 h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full flex flex-col justify-between overflow-hidden bg-background px-4 sm:px-6 lg:px-8 py-6 select-none">
+        {/* Subtle Ambient Static Gradient (Zero expensive dynamic blurs) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-40 dark:opacity-25 overflow-hidden"
-        >
-          <div
-            ref={glowRef}
-            className="w-[450px] h-[450px] rounded-full blur-3xl transition-colors duration-500 ease-out"
-            style={{ backgroundColor: SLIDES[activeIndex].accentGlow }}
-          />
-        </div>
+          className="pointer-events-none absolute inset-0 opacity-20 dark:opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] bg-[size:24px_24px]"
+        />
 
         {/* Top Header / HUD */}
-        <div className="relative z-10 container mx-auto max-w-5xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+        <div className="relative z-10 container mx-auto max-w-5xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
@@ -252,7 +269,7 @@ export function ParallaxShowcaseSection() {
                 <span>Parallax Presentation Mode</span>
               </span>
               <span className="text-[11px] font-medium text-muted-foreground hidden sm:inline">
-                Scroll menggeser adegan di tempat
+                Scroll atau gunakan navigasi panah
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight">
@@ -260,121 +277,138 @@ export function ParallaxShowcaseSection() {
             </h2>
           </div>
 
-          {/* Interactive Steps Pill */}
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-muted/60 border border-border/60">
-            {SLIDES.map((slide, idx) => (
+          {/* Interactive Steps & Playback Controls */}
+          <div className="flex items-center gap-2">
+            {/* Step Pills */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/60 border border-border/60">
+              {SLIDES.map((slide, idx) => (
+                <button
+                  key={slide.id}
+                  type="button"
+                  onClick={() => goToSlide(idx)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                    activeIndex === idx
+                      ? "bg-card text-foreground shadow-xs border border-border/80"
+                      : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+                  }`}
+                  title={slide.title}
+                >
+                  <span>{slide.step}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Quick Prev / Next Arrows */}
+            <div className="flex items-center gap-1">
               <button
-                key={slide.id}
                 type="button"
-                onClick={() => jumpToSlide(idx)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  activeIndex === idx
-                    ? "bg-card text-foreground shadow-xs border border-border/80 scale-105"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                title={slide.title}
+                onClick={prevSlide}
+                aria-label="Slide sebelumnya"
+                className="p-1.5 rounded-xl border border-border/70 bg-card hover:bg-muted text-foreground transition-colors"
               >
-                <span>{slide.step}</span>
+                <ChevronLeft className="h-4 w-4" />
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={nextSlide}
+                aria-label="Slide berikutnya"
+                className="p-1.5 rounded-xl border border-border/70 bg-card hover:bg-muted text-foreground transition-colors"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsAutoPlay(!isAutoPlay)}
+                aria-label={isAutoPlay ? "Pause auto play" : "Play auto presentation"}
+                title={isAutoPlay ? "Jeda auto slide" : "Mulai auto slide"}
+                className={`p-1.5 rounded-xl border transition-colors ${
+                  isAutoPlay
+                    ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-500"
+                    : "border-border/70 bg-card hover:bg-muted text-muted-foreground"
+                }`}
+              >
+                {isAutoPlay ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Main Pinned Card Display (Hardware Accelerated 3D Slide Deck) */}
+        {/* Main Pinned Card Display (Fast, Crisp Solid Card Rendering) */}
         <div className="relative z-10 container mx-auto max-w-5xl flex-1 flex items-center justify-center py-4 my-auto">
-          <div className="w-full relative h-[420px] sm:h-[380px] md:h-[360px]">
-            {SLIDES.map((slide, idx) => {
-              const Icon = slide.icon;
-              const isActive = activeIndex === idx;
-              const isPast = activeIndex > idx;
-
-              return (
-                <div
-                  key={slide.id}
-                  className={`absolute inset-0 transition-all duration-300 ease-out will-change-transform transform-gpu ${
-                    isActive
-                      ? "opacity-100 translate-y-0 scale-100 pointer-events-auto z-20"
-                      : isPast
-                      ? "opacity-0 -translate-y-6 scale-95 pointer-events-none z-10"
-                      : "opacity-0 translate-y-6 scale-95 pointer-events-none z-0"
-                  }`}
-                >
-                  <div className="h-full flex flex-col justify-between rounded-3xl border border-border/70 bg-card/95 backdrop-blur-xl p-6 sm:p-8 md:p-9 shadow-xl space-y-4">
-                    {/* Card Top Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/50 pb-4">
-                      <div className="flex items-center gap-3.5">
-                        <div
-                          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-inner ${slide.accentBg}`}
-                        >
-                          <Icon className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
-                            {slide.category} • Tahap {slide.step}/04
-                          </span>
-                          <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug">
-                            {slide.title}
-                          </h3>
-                        </div>
-                      </div>
-
-                      {/* Visual Stat Pill */}
-                      <div className="hidden sm:flex flex-col items-end px-4 py-2 rounded-2xl border border-border/60 bg-muted/40">
-                        <span className="text-[10px] text-muted-foreground font-semibold uppercase">
-                          {slide.visualStats.label}
-                        </span>
-                        <span className="text-xl font-black text-foreground">
-                          {slide.visualStats.value}
-                        </span>
-                        <span className="text-[10px] text-emerald-500 font-medium">
-                          {slide.visualStats.sublabel}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Subtitle & Description */}
-                    <div className="space-y-1.5">
-                      <h4 className="text-sm sm:text-base font-bold text-foreground">
-                        {slide.subtitle}
-                      </h4>
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                        {slide.description}
-                      </p>
-                    </div>
-
-                    {/* Key Technical Points */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1">
-                      {slide.points.map((pt, pIdx) => (
-                        <div
-                          key={pIdx}
-                          className="flex items-start gap-2 p-2.5 rounded-xl border border-border/40 bg-muted/30"
-                        >
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-                          <span className="text-xs text-muted-foreground font-medium leading-relaxed">
-                            {pt}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Tech Badges */}
-                    <div className="pt-2 flex flex-wrap items-center gap-1.5 border-t border-border/40">
-                      <span className="text-[11px] font-bold text-muted-foreground uppercase mr-1">
-                        Core Stack:
-                      </span>
-                      {slide.techs.map((tech) => (
-                        <span
-                          key={tech}
-                          className="text-xs font-semibold px-2.5 py-0.5 rounded-lg bg-muted text-foreground border border-border/50"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
+          <div className="w-full">
+            <div className="rounded-2xl border border-border/80 bg-card p-6 sm:p-8 md:p-9 shadow-lg space-y-5 transition-all duration-200">
+              {/* Card Top Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/50 pb-4">
+                <div className="flex items-center gap-3.5">
+                  <div
+                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-2xs ${currentSlide.accentBg}`}
+                  >
+                    <CurrentIcon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
+                      {currentSlide.category} • Tahap {currentSlide.step}/04
+                    </span>
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-snug">
+                      {currentSlide.title}
+                    </h3>
                   </div>
                 </div>
-              );
-            })}
+
+                {/* Visual Stat Pill */}
+                <div className="hidden sm:flex flex-col items-end px-4 py-2 rounded-2xl border border-border/60 bg-muted/40 shrink-0">
+                  <span className="text-[10px] text-muted-foreground font-semibold uppercase">
+                    {currentSlide.visualStats.label}
+                  </span>
+                  <span className="text-xl font-black text-foreground">
+                    {currentSlide.visualStats.value}
+                  </span>
+                  <span className="text-[10px] text-emerald-500 font-medium">
+                    {currentSlide.visualStats.sublabel}
+                  </span>
+                </div>
+              </div>
+
+              {/* Subtitle & Description */}
+              <div className="space-y-1.5">
+                <h4 className="text-sm sm:text-base font-bold text-foreground">
+                  {currentSlide.subtitle}
+                </h4>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {currentSlide.description}
+                </p>
+              </div>
+
+              {/* Key Technical Points */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1">
+                {currentSlide.points.map((pt, pIdx) => (
+                  <div
+                    key={pIdx}
+                    className="flex items-start gap-2 p-2.5 rounded-xl border border-border/40 bg-muted/30"
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <span className="text-xs text-muted-foreground font-medium leading-relaxed">
+                      {pt}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Tech Badges */}
+              <div className="pt-2 flex flex-wrap items-center gap-1.5 border-t border-border/40">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase mr-1">
+                  Core Stack:
+                </span>
+                {currentSlide.techs.map((tech) => (
+                  <span
+                    key={tech}
+                    className="text-xs font-semibold px-2.5 py-0.5 rounded-lg bg-muted text-foreground border border-border/50"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -388,13 +422,13 @@ export function ParallaxShowcaseSection() {
             </span>
             <span className="font-semibold text-foreground">
               {activeIndex < SLIDES.length - 1
-                ? "Scroll ke bawah untuk beralih slide"
-                : "Akhir pilar arsitektur • Lanjut ke riwayat karir"}
+                ? "Scroll ke bawah untuk tahap selanjutnya"
+                : "Tahap 04 selesai • Lanjut ke riwayat karir"}
             </span>
             <ChevronDown className="h-4 w-4 animate-bounce text-emerald-500" />
           </div>
 
-          {/* Dynamic Progress Bar (Hardware GPU Transform ScaleX) */}
+          {/* Dynamic Progress Bar (Hardware GPU scaleX) */}
           <div className="flex items-center gap-3">
             <span
               ref={progressPercentRef}
@@ -405,7 +439,7 @@ export function ParallaxShowcaseSection() {
             <div className="w-24 sm:w-36 h-2 rounded-full bg-muted overflow-hidden border border-border/50">
               <div
                 ref={progressBarRef}
-                className="h-full w-full bg-emerald-500 origin-left will-change-transform transform-gpu rounded-full"
+                className="h-full w-full bg-emerald-500 origin-left rounded-full"
                 style={{ transform: "scaleX(0)" }}
               />
             </div>
