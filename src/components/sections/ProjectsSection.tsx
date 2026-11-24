@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { PROJECTS } from "@/data/portfolioData";
 import { Badge } from "@/components/ui/badge";
 import { ProjectThumbnail } from "@/components/ui/project-thumbnail";
-import { FolderGit2, ExternalLink, Github, Sparkles } from "lucide-react";
+import { FolderGit2, ExternalLink, Github, Sparkles, Box, ShieldCheck, Zap } from "lucide-react";
 
 export function ProjectsSection() {
   const [filter, setFilter] = useState<string>("Semua");
@@ -49,20 +49,23 @@ export function ProjectsSection() {
   });
 
   return (
-    <section id="projects" className="py-14 sm:py-20 border-b border-border/40">
+    <section id="projects" className="py-14 sm:py-20 border-b border-border/40 relative">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-10 max-w-5xl">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              <FolderGit2 className="h-4 w-4" />
-              <span>Portfolio Unggulan & Repositori GitHub</span>
+            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              <Box className="h-4 w-4" />
+              <span>LEGENDARY INVENTORY & ARMORY OF ARTIFACTS</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tight">
-              Proyek Nyata & Sistem Produksi
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tight flex items-center gap-2.5">
+              Armory: Proyek & Sistem Nyata
+              <span className="text-xs px-2.5 py-0.5 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-500 font-mono font-bold">
+                12+ WEAPONS / APPS
+              </span>
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
-              Koleksi sistem enterprise, kasir POS cloud, microservices Golang/NestJS, dashboard telemetri IoT, mobile apps Flutter, dan library open-source di GitHub.
+              Katalog sistem enterprise, cloud microservices, mobile apps Flutter, dan library open-source di GitHub yang telah diverifikasi di medan perang produksi.
             </p>
           </div>
 
@@ -73,9 +76,9 @@ export function ProjectsSection() {
                 key={cat}
                 type="button"
                 onClick={() => setFilter(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 ${
                   filter === cat
-                    ? "bg-card text-foreground shadow-xs border border-border/80"
+                    ? "bg-card text-emerald-500 shadow-xs border border-emerald-500/40"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -90,8 +93,13 @@ export function ProjectsSection() {
           {filteredProjects.map((proj, idx) => (
             <div
               key={idx}
-              className="flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-5 sm:p-6 shadow-xs hover:border-emerald-500/40 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 space-y-5 group"
+              className="flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-5 sm:p-6 shadow-xs hover:border-emerald-500/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 space-y-5 group relative overflow-hidden"
             >
+              {/* Top corner inventory item index */}
+              <div className="absolute top-2 right-3 font-mono text-[10px] text-muted-foreground/40 font-bold select-none">
+                SLOT #{String(idx + 1).padStart(2, "0")}
+              </div>
+
               {/* Web Browser Mockup Thumbnail */}
               <ProjectThumbnail
                 title={proj.title}
@@ -100,64 +108,60 @@ export function ProjectsSection() {
                 badge={proj.badge}
               />
 
-              {/* Project Details */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/5"
-                  >
-                    {proj.badge}
-                  </Badge>
-                  <Sparkles className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-emerald-500 transition-colors" />
+              <div className="space-y-3 flex-1 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-lg font-bold text-foreground group-hover:text-emerald-500 transition-colors">
+                      {proj.title}
+                    </h3>
+                  </div>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                    {proj.description}
+                  </p>
                 </div>
 
-                <h3 className="text-lg font-bold text-foreground leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  {proj.title}
-                </h3>
-                <p className="text-xs text-muted-foreground font-medium -mt-1">
-                  {proj.subtitle}
-                </p>
-
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  {proj.description}
-                </p>
-              </div>
-
-              {/* Tech Tags & Action Links */}
-              <div className="space-y-4 pt-3 border-t border-border/50">
-                <div className="flex flex-wrap gap-1.5">
+                {/* Tech Badges */}
+                <div className="flex flex-wrap gap-1.5 pt-2">
                   {proj.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground"
+                      className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-muted/60 text-muted-foreground border border-border/50 group-hover:border-emerald-500/30 group-hover:text-foreground transition-colors"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
+              </div>
 
-                {/* Direct GitHub & Live Links */}
-                {proj.links && (
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    {proj.links.map((link) => (
-                      <a
-                        key={link.label}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3.5 py-1.5 text-xs font-bold text-foreground hover:bg-muted/80 hover:border-foreground/30 transition-all active:scale-95"
-                      >
-                        {link.label.includes("Repo") || link.label === "GitHub" ? (
-                          <Github className="h-3.5 w-3.5 text-muted-foreground" />
-                        ) : (
-                          <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-                        )}
-                        <span>{link.label}</span>
-                      </a>
-                    ))}
-                  </div>
-                )}
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/50">
+                {proj.links && proj.links.map((link, lIdx) => {
+                  const isGithub = link.url.includes("github.com");
+                  const isNpm = link.url.includes("npmjs.com");
+
+                  return (
+                    <a
+                      key={lIdx}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex-1 min-w-[130px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all hover:scale-[1.02] ${
+                        isGithub
+                          ? "bg-muted/80 text-foreground border border-border/70 hover:bg-muted hover:border-emerald-500/40"
+                          : "bg-emerald-600 text-white hover:bg-emerald-500 shadow-xs"
+                      }`}
+                    >
+                      {isGithub ? (
+                        <Github className="h-3.5 w-3.5" />
+                      ) : isNpm ? (
+                        <Box className="h-3.5 w-3.5" />
+                      ) : (
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      )}
+                      <span>{link.label.toUpperCase()}</span>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           ))}

@@ -9,11 +9,13 @@ import { SkillsSection } from "@/components/sections/SkillsSection";
 import { EducationSection } from "@/components/sections/EducationSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { BackToTop } from "@/components/ui/back-to-top";
+import { GameHUD } from "@/components/ui/game-hud";
 
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground antialiased selection:bg-emerald-500/20 selection:text-emerald-500">
       <Navbar />
+      <GameHUD />
       <main className="flex-1">
         <HeroSection />
         <LiveSystemVisualizer />
