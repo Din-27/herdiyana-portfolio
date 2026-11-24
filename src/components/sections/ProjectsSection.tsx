@@ -76,11 +76,10 @@ export function ProjectsSection() {
                 key={cat}
                 type="button"
                 onClick={() => setFilter(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 ${
-                  filter === cat
-                    ? "bg-card text-emerald-500 shadow-xs border border-emerald-500/40"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all duration-200 ${filter === cat
+                  ? "bg-card text-emerald-500 shadow-xs border border-emerald-500/40"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 {cat}
               </button>
@@ -145,11 +144,10 @@ export function ProjectsSection() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex-1 min-w-[130px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all hover:scale-[1.02] ${
-                        isGithub
-                          ? "bg-muted/80 text-foreground border border-border/70 hover:bg-muted hover:border-emerald-500/40"
-                          : "bg-emerald-600 text-white hover:bg-emerald-500 shadow-xs"
-                      }`}
+                      className={`flex-1 min-w-[130px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all hover:scale-[1.02] ${isGithub
+                        ? "bg-muted/80 text-foreground border border-border/70 hover:bg-muted hover:border-emerald-500/40"
+                        : "bg-emerald-600 text-white hover:bg-emerald-500 shadow-xs"
+                        }`}
                     >
                       {isGithub ? (
                         <Github className="h-3.5 w-3.5" />
