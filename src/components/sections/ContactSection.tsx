@@ -4,46 +4,40 @@ import React, { useState } from "react";
 import { PERSONAL_INFO } from "@/data/portfolioData";
 import {
   Mail,
-  MessageCircle,
   MapPin,
   Send,
   CheckCircle2,
-  Phone,
   Github,
   Linkedin,
-  Copy,
-  Check,
   ExternalLink,
+  Clock,
+  Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 
 export function ContactSection() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [copiedEmail, setCopiedEmail] = useState(false);
-  const [copiedPhone, setCopiedPhone] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const copyToClipboard = (text: string, type: "email" | "phone") => {
-    navigator.clipboard.writeText(text);
-    if (type === "email") {
-      setCopiedEmail(true);
-      setTimeout(() => setCopiedEmail(false), 2000);
-    } else {
-      setCopiedPhone(true);
-      setTimeout(() => setCopiedPhone(false), 2000);
-    }
-  };
+  const [isSent, setIsSent] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    // Prefill direct WhatsApp chat
-    const text = encodeURIComponent(
-      `Halo Herdiyana, saya ${name} (${email}).\n\nPesan:\n${message}`
+
+    const mailSubject = encodeURIComponent(
+      subject
+        ? `[Portfolio Inquiry] ${subject} - ${name}`
+        : `[Portfolio Inquiry] Pesan Baru dari ${name}`
     );
-    window.open(`https://wa.me/6285163623378?text=${text}`, "_blank");
-    setIsSubmitting(false);
+
+    const mailBody = encodeURIComponent(
+      `Halo Herdiyana,\n\nNama: ${name}\nEmail Pengirim: ${email}\nTopik / Subjek: ${subject || "Kolaborasi / Proyek"}\n\nPesan:\n${message}\n\n---\nDikirim melalui formulir kontak portfolio herdiyana.vercel.app`
+    );
+
+    // Langsung arahkan ke email client pengguna
+    window.location.href = `mailto:${PERSONAL_INFO.email}?subject=${mailSubject}&body=${mailBody}`;
+    setIsSent(true);
   };
 
   return (
@@ -59,142 +53,103 @@ export function ContactSection() {
             Hubungi Saya
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
-            Tertarik bekerja sama untuk proyek fullstack, konsultasi arsitektur sistem enterprise, atau peluang karir? Jangan ragu menghubungi saya.
+            Tertarik bekerja sama untuk proyek fullstack, konsultasi arsitektur sistem enterprise, atau peluang karir? Kirim pesan langsung melalui formulir di bawah ini.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          {/* Direct Contact Cards */}
+          {/* Information & Social Profiles Column */}
           <div className="space-y-4">
-            {/* WhatsApp Card */}
-            <div className="flex items-center justify-between p-4 sm:p-5 rounded-2xl border border-border/60 bg-card hover:border-emerald-500/50 hover:shadow-xs transition-all duration-200">
-              <div className="flex items-center gap-3.5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
-                  <MessageCircle className="h-5 w-5" />
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground block font-medium">
-                    WhatsApp Langsung
-                  </span>
-                  <a
-                    href={PERSONAL_INFO.whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm sm:text-base font-bold text-foreground hover:text-emerald-500 transition-colors"
-                  >
-                    {PERSONAL_INFO.phone}
-                  </a>
-                </div>
+            {/* Availability & Response Time Card */}
+            <div className="p-5 sm:p-6 rounded-2xl border border-border/70 bg-card space-y-4 shadow-xs">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  {PERSONAL_INFO.status}
+                </span>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(PERSONAL_INFO.phone, "phone")}
-                  aria-label="Salin nomor telepon"
-                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  title="Salin Nomor"
-                >
-                  {copiedPhone ? (
-                    <Check className="h-4 w-4 text-emerald-500" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </button>
-                <a
-                  href={PERSONAL_INFO.whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Buka WhatsApp"
-                  className="p-2 rounded-xl text-muted-foreground hover:text-emerald-500 hover:bg-muted transition-colors"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
+              <h3 className="text-base sm:text-lg font-bold text-foreground leading-snug">
+                Siap Berdiskusi Mengenai Proyek & Tantangan Teknis Anda
+              </h3>
+
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                Silakan isi formulir pesan di sebelah kanan. Pengiriman pesan akan langsung diarahkan ke email resmi saya dan direspon sesegera mungkin.
+              </p>
+
+              <div className="pt-2 border-t border-border/50 flex items-center gap-2 text-xs text-muted-foreground font-medium">
+                <Clock className="h-4 w-4 text-emerald-500 shrink-0" />
+                <span>Waktu respon standar: dalam 1x24 jam kerja</span>
               </div>
             </div>
 
-            {/* Email Card */}
-            <div className="flex items-center justify-between p-4 sm:p-5 rounded-2xl border border-border/60 bg-card hover:border-emerald-500/50 hover:shadow-xs transition-all duration-200">
-              <div className="flex items-center gap-3.5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground block font-medium">
-                    Email Resmi
-                  </span>
-                  <a
-                    href={`mailto:${PERSONAL_INFO.email}`}
-                    className="text-xs sm:text-sm font-bold text-foreground hover:text-emerald-500 transition-colors break-all"
-                  >
-                    {PERSONAL_INFO.email}
-                  </a>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => copyToClipboard(PERSONAL_INFO.email, "email")}
-                aria-label="Salin alamat email"
-                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                title="Salin Email"
-              >
-                {copiedEmail ? (
-                  <Check className="h-4 w-4 text-emerald-500" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-
-            {/* Location Card */}
-            <div className="p-4 sm:p-5 rounded-2xl border border-border/60 bg-card/60 space-y-1">
-              <span className="text-xs text-muted-foreground block font-medium">
-                Lokasi & Domisili
-              </span>
-              <span className="text-sm font-bold text-foreground flex items-center gap-2">
+            {/* Location & Work Model Card */}
+            <div className="p-5 rounded-2xl border border-border/60 bg-card/70 space-y-2">
+              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                 <MapPin className="h-4 w-4 text-emerald-500 shrink-0" />
+                <span>Lokasi & Model Kerja</span>
+              </div>
+              <div className="text-sm font-bold text-foreground">
                 {PERSONAL_INFO.location}
-              </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Terbuka untuk kolaborasi <span className="text-foreground font-semibold">Remote</span>, <span className="text-foreground font-semibold">Hybrid</span>, maupun <span className="text-foreground font-semibold">On-Site</span> (Jabodetabek & Bandung).
+              </p>
             </div>
 
-            {/* Social Links Row */}
-            <div className="flex items-center gap-3 pt-2">
+            {/* Professional Profiles Row */}
+            <div className="grid grid-cols-2 gap-3 pt-1">
               <a
                 href={PERSONAL_INFO.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-card text-xs font-bold text-foreground hover:bg-muted hover:border-foreground/30 transition-all active:scale-98"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 bg-card hover:border-foreground/30 hover:bg-muted/60 transition-all duration-200 group"
               >
-                <Github className="h-4 w-4" />
-                <span>GitHub</span>
+                <div className="flex items-center gap-2.5">
+                  <Github className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <span className="text-xs font-bold text-foreground">GitHub</span>
+                </div>
+                <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
+
               <a
                 href={PERSONAL_INFO.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-card text-xs font-bold text-foreground hover:bg-muted hover:border-foreground/30 transition-all active:scale-98"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 bg-card hover:border-foreground/30 hover:bg-muted/60 transition-all duration-200 group"
               >
-                <Linkedin className="h-4 w-4" />
-                <span>LinkedIn</span>
+                <div className="flex items-center gap-2.5">
+                  <Linkedin className="h-4 w-4 text-blue-500 group-hover:text-blue-600 transition-colors" />
+                  <span className="text-xs font-bold text-foreground">LinkedIn</span>
+                </div>
+                <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
             </div>
           </div>
 
-          {/* Direct WhatsApp Quick Contact Form */}
-          <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-7 shadow-xs space-y-4">
+          {/* Quick Message Form (Directing to Email) */}
+          <div className="rounded-2xl border border-border/70 bg-card p-6 sm:p-7 shadow-xs space-y-5">
             <div className="space-y-1">
-              <h3 className="text-base sm:text-lg font-bold text-foreground">
-                Kirim Pesan Cepat
+              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Formulir Pesan Cepat</span>
+              </div>
+              <h3 className="text-lg font-bold text-foreground">
+                Kirim Pesan ke Email
               </h3>
               <p className="text-xs text-muted-foreground">
-                Pesan akan langsung terhubung ke WhatsApp saya dengan format rapi.
+                Formulir akan otomatis membuka email client Anda dengan format pesan yang telah terstruktur rapi.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground">Nama Lengkap</label>
+                <label className="text-xs font-bold text-foreground">
+                  Nama Lengkap <span className="text-emerald-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
@@ -206,7 +161,9 @@ export function ContactSection() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground">Email / Kontak</label>
+                <label className="text-xs font-bold text-foreground">
+                  Email Anda <span className="text-emerald-500">*</span>
+                </label>
                 <input
                   type="email"
                   required
@@ -218,25 +175,46 @@ export function ContactSection() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground">Pesan / Diskusi Proyek</label>
+                <label className="text-xs font-bold text-foreground">
+                  Subjek / Topik Diskusi
+                </label>
+                <input
+                  type="text"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="cth. Penawaran Proyek Fullstack / Peluang Kerja"
+                  className="w-full rounded-xl border border-border/80 bg-background px-3.5 py-2.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-foreground">
+                  Isi Pesan <span className="text-emerald-500">*</span>
+                </label>
                 <textarea
                   required
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Halo Herdiyana, saya tertarik untuk mendiskusikan proyek..."
+                  placeholder="Halo Herdiyana, saya tertarik untuk mendiskusikan kebutuhan sistem..."
                   className="w-full rounded-xl border border-border/80 bg-background px-3.5 py-2.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 transition-all resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm py-3 shadow-md shadow-emerald-600/20 transition-all active:scale-98"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm py-3 shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 transition-all duration-200 active:scale-98"
               >
                 <Send className="h-4 w-4" />
-                <span>Kirim via WhatsApp</span>
+                <span>Kirim Pesan ke Email</span>
               </button>
+
+              {isSent && (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 shrink-0" />
+                  <span>Aplikasi email Anda sedang dibuka untuk menyelesaikan pengiriman pesan.</span>
+                </div>
+              )}
             </form>
           </div>
         </div>

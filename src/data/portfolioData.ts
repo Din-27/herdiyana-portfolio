@@ -2,8 +2,6 @@ export const PERSONAL_INFO = {
   name: "Herdiyana Firmansyah",
   title: "Fullstack Developer & Software Engineer",
   location: "North Bekasi, West Java, Indonesia",
-  phone: "+62 851-6362-3378",
-  whatsappUrl: "https://wa.me/6285163623378",
   email: "herdiyanafirmansyah27@gmail.com",
   website: "https://herdiyana.vercel.app",
   github: "https://github.com/Din-27",

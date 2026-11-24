@@ -5,7 +5,7 @@ import Link from "next/link";
 import { PERSONAL_INFO } from "@/data/portfolioData";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "@/components/ui/logo";
-import { Menu, X, MessageCircle, ChevronRight } from "lucide-react";
+import { Menu, X, Send, ChevronRight } from "lucide-react";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,13 +61,11 @@ export function Navbar() {
           <ThemeToggle />
 
           <a
-            href={PERSONAL_INFO.whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#contact"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 text-xs font-bold transition-all duration-200 shadow-xs hover:shadow-emerald-600/20 active:scale-95"
           >
-            <MessageCircle className="h-3.5 w-3.5" />
-            <span>Chat WhatsApp</span>
+            <Send className="h-3.5 w-3.5" />
+            <span>Hubungi Saya</span>
           </a>
 
           {/* Mobile Menu Toggle Button */}
@@ -101,14 +99,12 @@ export function Navbar() {
 
           <div className="pt-3 border-t border-border/50">
             <a
-              href={PERSONAL_INFO.whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#contact"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 text-xs font-bold shadow-md transition-all active:scale-98"
             >
-              <MessageCircle className="h-4 w-4" />
-              <span>Hubungi via WhatsApp</span>
+              <Send className="h-4 w-4" />
+              <span>Hubungi Saya</span>
             </a>
           </div>
         </div>

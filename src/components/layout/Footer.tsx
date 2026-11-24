@@ -1,7 +1,7 @@
 import React from "react";
 import { PERSONAL_INFO } from "@/data/portfolioData";
 import { Logo } from "@/components/ui/logo";
-import { Github, Linkedin, ExternalLink, Mail, Heart } from "lucide-react";
+import { Github, Linkedin, ExternalLink, Send } from "lucide-react";
 
 export function Footer() {
   return (
@@ -47,11 +47,11 @@ export function Footer() {
               <span>Vercel</span>
             </a>
             <a
-              href={`mailto:${PERSONAL_INFO.email}`}
+              href="#contact"
               className="hover:text-foreground transition-colors flex items-center gap-1.5"
             >
-              <Mail className="h-3.5 w-3.5" />
-              <span>Email</span>
+              <Send className="h-3.5 w-3.5" />
+              <span>Kontak</span>
             </a>
           </div>
         </div>

@@ -6,9 +6,7 @@ import {
   ExternalLink,
   Github,
   Linkedin,
-  Mail,
   MapPin,
-  MessageCircle,
   Building2,
   TrendingUp,
   Layers,
@@ -18,6 +16,8 @@ import {
   Terminal,
   Sparkles,
   ChevronDown,
+  Send,
+  FolderGit2,
 } from "lucide-react";
 
 const ROLES = [
@@ -157,21 +157,19 @@ export function HeroSection() {
         {/* Action Buttons & Social Links */}
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <a
-            href={PERSONAL_INFO.whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#contact"
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-6 py-3 shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 transition-all duration-200 active:scale-95 group"
           >
-            <MessageCircle className="h-4 w-4 transition-transform group-hover:scale-110" />
-            <span>Hubungi via WhatsApp</span>
+            <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <span>Kirim Pesan</span>
           </a>
 
           <a
-            href={`mailto:${PERSONAL_INFO.email}`}
+            href="#projects"
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-card border border-border hover:border-foreground/30 text-foreground font-bold text-xs sm:text-sm px-6 py-3 shadow-xs hover:bg-muted/70 transition-all duration-200 active:scale-95"
           >
-            <Mail className="h-4 w-4" />
-            <span>Kirim Email</span>
+            <FolderGit2 className="h-4 w-4 text-emerald-500" />
+            <span>Lihat Proyek</span>
           </a>
 
           {/* Social Icons */}
