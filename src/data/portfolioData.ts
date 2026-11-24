@@ -26,47 +26,57 @@ export const SKILLS = {
   frontend: [
     "React.js",
     "Next.js",
-    "React Native",
     "TypeScript",
-    "JavaScript",
+    "JavaScript (ES6+)",
     "Tailwind CSS",
-    "Bootstrap 5",
     "Redux Toolkit",
     "React Query",
+    "Bootstrap 5",
     "HTML5 / CSS3",
   ],
+  mobile: [
+    "Flutter (Dart)",
+    "React Native",
+    "Kotlin (Android)",
+    "Swift (iOS)",
+    "Dart FFI & C++ Native",
+  ],
   backend: [
-    "Node.js",
-    "Express.js",
-    "NestJS",
     "Golang (Gin, Gorm)",
+    "Node.js",
+    "NestJS",
+    "Express.js",
+    "FastAPI (Python)",
     "gRPC",
-    "Socket.io",
     "RabbitMQ",
-    "Python",
+    "Socket.io / WebSockets",
+    "PHP",
     ".NET Core",
     "Solidity (EVM)",
   ],
   databases: [
     "PostgreSQL",
     "MySQL",
+    "PLpgSQL Functions",
+    "Redis (In-Memory Caching)",
     "MongoDB",
-    "Redis",
     "Firebase Firestore",
-    "Query Optimization",
+    "Query Optimization (EXPLAIN ANALYZE)",
     "Prisma ORM",
     "TypeORM",
     "Gorm",
   ],
   cloudDevops: [
+    "Docker & Containerization",
     "Google Cloud Platform (GCP)",
     "AWS (S3)",
+    "Serverless Architecture",
     "Linux (Ubuntu/Debian)",
-    "Docker",
-    "Git / GitHub",
-    "Playwright E2E",
-    "Vercel",
+    "Playwright E2E Testing",
     "CI/CD Workflows",
+    "NPM Package Publishing",
+    "Shell Scripting",
+    "Git / GitHub CLI",
   ],
 };
 
@@ -140,56 +150,134 @@ export interface ProjectItem {
   description: string;
   tags: string[];
   badge: string;
-  links?: { label: string; url: string }[];
+  domain: string;
+  mockupType: "kanban" | "pos" | "iot" | "database" | "serverless" | "ecommerce" | "terminal" | "blockchain" | "mobile";
+  links: { label: string; url: string }[];
 }
 
 export const PROJECTS: ProjectItem[] = [
   {
-    title: "Omni-Channel Retail & Cloud POS Ecosystem",
-    subtitle: "WarungLokal & Portal-27",
-    badge: "POS App • WarungLokal",
+    title: "Kinetic Task & Workflow Management Enterprise",
+    subtitle: "Asana-Scale Collaborative Kanban with PostgreSQL",
+    badge: "Enterprise Kanban • Production App",
+    domain: "udin-kinetic-task.vercel.app",
+    mockupType: "kanban",
     description:
-      "Integrated retail commerce ecosystem featuring an interactive Point-of-Sale (POS) cashier terminal, dynamic online storefronts, automated shopping carts, and centralized inventory order management.",
-    tags: ["Next.js", "React.js", "Express.js", "MySQL", "Tailwind CSS"],
+      "Sistem kolaborasi dan manajemen alur kerja tugas berskala enterprise dengan papan status Kanban dinamis, drag-and-drop workflow, JWT authentication, dan PostgreSQL backend dengan optimasi fungsi PLpgSQL.",
+    tags: ["Next.js", "TypeScript", "Node.js", "PostgreSQL", "Docker", "Tailwind CSS"],
     links: [
-      { label: "Live Demo", url: "https://herdiyana.vercel.app" },
-      { label: "GitHub", url: "https://github.com/Din-27" },
+      { label: "Live Demo", url: "https://udin-kinetic-task-management-fronte.vercel.app" },
+      { label: "Frontend Repo", url: "https://github.com/Din-27/Udin.Kinetic.Task.Management.Frontend" },
+      { label: "Backend Repo", url: "https://github.com/Din-27/Udin.Kinetic.Task.Management.Backend" },
     ],
   },
   {
-    title: "Enterprise Task Management & Ticketing Portal",
-    subtitle: "TaskApp Demo & Habitat Ticketing",
-    badge: "TaskApp • Habitat Ticketing",
+    title: "Casheer Cloud POS Terminal & Cashier System",
+    subtitle: "Modern Point-of-Sale with Instant Cart & Receipt Engine",
+    badge: "Point-of-Sale • Cloud Cashier",
+    domain: "casheer-app-navy.vercel.app",
+    mockupType: "pos",
     description:
-      "Collaborative productivity platform (Asana-inspired) with Kanban status boards and JWT auth. Additionally designed a live wildlife park booking & ticket reservation portal with interactive guest checkouts.",
-    tags: ["TypeScript", "React.js", "Node.js", "PostgreSQL", "Tailwind CSS"],
+      "Aplikasi kasir Point-of-Sale (POS) cloud modern dengan kalkulasi transaksi instan, manajemen katalog item, receipt printer generator, dan antarmuka responsif ramah layar sentuh tablet/desktop.",
+    tags: ["React.js", "JavaScript", "POS Terminal", "Tailwind CSS", "REST API"],
     links: [
-      { label: "Live Portal", url: "https://herdiyana.vercel.app" },
-      { label: "GitHub", url: "https://github.com/Din-27" },
+      { label: "Live Demo", url: "https://casheer-app-navy.vercel.app" },
+      { label: "GitHub Repo", url: "https://github.com/Din-27/casheer-app" },
     ],
   },
   {
-    title: "Job Portal Platform & Golang Microservices",
-    subtitle: "Recruitment Ecosystem & High-Throughput APIs",
-    badge: "Live Portal • Go Backend",
+    title: "Smart Home & IoT Telemetry Dashboard",
+    subtitle: "Real-Time Sensor Monitoring & Appliance Controls",
+    badge: "IoT & Real-Time Dashboard",
+    domain: "smarthome-iot.internal",
+    mockupType: "iot",
     description:
-      "Recruitment portal ecosystem with dedicated applicant discovery interfaces and high-performance backend microservices built with Go (Gin) for low-latency job filtering and recruiter management.",
-    tags: ["Golang (Gin)", "Next.js", "Tailwind CSS", "REST API", "PostgreSQL"],
+      "Dashboard visualisasi telemetri perangkat IoT rumah pintar dengan grafik pemantauan suhu, kelembaban, efisiensi konsumsi daya, dan saklar kontrol perangkat berbasis WebSockets secara real-time.",
+    tags: ["Next.js", "TypeScript", "IoT Telemetry", "Tailwind CSS", "WebSockets"],
     links: [
-      { label: "Live Portal", url: "https://herdiyana.vercel.app" },
-      { label: "GitHub", url: "https://github.com/Din-27" },
+      { label: "GitHub Repo", url: "https://github.com/Din-27/smart-home-website" },
     ],
   },
   {
-    title: "WhatsApp Bot Server, Go Mining Engine & NPM Package",
-    subtitle: "Automation Services & Open Source Module",
-    badge: "WA Bot • NPM Package",
+    title: "SQL Query Monitor & Index Performance Profiler",
+    subtitle: "Deep-Dive Database Performance Tuning & EXPLAIN Analyzer",
+    badge: "Database Tool • Query Tuning",
+    domain: "query-monitor.internal",
+    mockupType: "database",
     description:
-      "Engineered WhatsApp automated bot services (Frontend + WebSocket server), a Go-based blockchain proof-of-work simulation, and published the open-source folder-temporary library on npm registry.",
-    tags: ["Node.js", "Golang (ME-Coin)", "NPM Module", "Socket.io", "WebSocket"],
+      "Penganalisis performa kueri database relasional untuk mendeteksi slow queries, index scans yang tidak efisien, dan optimasi kueri PostgreSQL/MySQL dengan perbandingan latensi sebelum dan sesudah refactoring.",
+    tags: ["JavaScript", "PostgreSQL", "MySQL", "Query Profiler", "Performance Tuning"],
+    links: [
+      { label: "GitHub Repo", url: "https://github.com/Din-27/query-monitor" },
+    ],
+  },
+  {
+    title: "Colyin Serverless App & Cloud Microservices",
+    subtitle: "Event-Driven Serverless Compute with Docker",
+    badge: "Cloud Serverless • Microservices",
+    domain: "colyin.serverless.cloud",
+    mockupType: "serverless",
+    description:
+      "Arsitektur komputasi serverless berbasis event untuk penanganan fungsi on-demand, orkestrasi kontainerisasi Docker otomatis, dan utilitas shell script Linux terisolasi.",
+    tags: ["TypeScript", "Serverless", "Docker", "Shell Scripting", "Node.js"],
+    links: [
+      { label: "GitHub Repo", url: "https://github.com/Din-27/Colyin.Serverless.App" },
+    ],
+  },
+  {
+    title: "Modern E-Commerce Storefront & NestJS Backend",
+    subtitle: "Headless E-Commerce with Modular Cart & Payment Integration",
+    badge: "Modern E-Commerce Store",
+    domain: "fashion-web.vercel.app",
+    mockupType: "ecommerce",
+    description:
+      "Aplikasi toko online modern dengan katalog produk berkinerja tinggi, keranjang belanja interaktif, filter kategori pakaian, dan backend modular berbasis framework enterprise NestJS.",
+    tags: ["Next.js", "TypeScript", "NestJS", "E-Commerce", "REST API"],
+    links: [
+      { label: "Frontend Repo", url: "https://github.com/Din-27/fashion-web" },
+      { label: "Backend Repo", url: "https://github.com/Din-27/nest-commerce" },
+    ],
+  },
+  {
+    title: "Din-Logger & Open-Source Node.js Modules",
+    subtitle: "Published NPM Package & Structured System Logger",
+    badge: "NPM Package • Open Source",
+    domain: "npmjs.com/package/folder-temporary",
+    mockupType: "terminal",
+    description:
+      "Modul utilitas open-source terpublikasi di NPM registry (folder-temporary) untuk isolasi direktori sementara, serta library logger terstruktur untuk logging microservices Node.js/TypeScript.",
+    tags: ["TypeScript", "Node.js", "NPM Registry", "Open Source", "Package Authoring"],
     links: [
       { label: "NPM Package", url: "https://www.npmjs.com/package/folder-temporary" },
-      { label: "GitHub", url: "https://github.com/Din-27" },
+      { label: "GitHub Repo", url: "https://github.com/Din-27/din-logger" },
+    ],
+  },
+  {
+    title: "ME-Coin Blockchain Engine & Golang Services",
+    subtitle: "Proof-of-Work Crypto Engine & High-Throughput APIs",
+    badge: "Golang Microservices & Blockchain",
+    domain: "me-coin.chain.internal",
+    mockupType: "blockchain",
+    description:
+      "Simulasi mesin blockchain terdistribusi dengan mekanisme konsensus Proof-of-Work (PoW), kalkulasi hash kriptografis, dan backend Golang (Gin) untuk integrasi microservices berlatensi rendah.",
+    tags: ["Golang", "Gin Framework", "Blockchain PoW", "Docker", "Cryptography"],
+    links: [
+      { label: "Blockchain Repo", url: "https://github.com/Din-27/ME-coin" },
+      { label: "Go Service Repo", url: "https://github.com/Din-27/Golang.Backend.Test.App" },
+    ],
+  },
+  {
+    title: "Flutter Sound Native & Mobile Cross-Platform",
+    subtitle: "Dart, C++, Swift & Kotlin Audio Engine Integration",
+    badge: "Mobile Native • Flutter & Cross-Platform",
+    domain: "mobile.app.android.ios",
+    mockupType: "mobile",
+    description:
+      "Integrasi modul audio native berkinerja tinggi pada framework Flutter menggunakan Dart FFI, library C++, Kotlin (Android), dan Swift (iOS) untuk pemrosesan media audio lintas platform.",
+    tags: ["Flutter", "Dart", "C++ Native", "Swift", "Kotlin", "React Native"],
+    links: [
+      { label: "Flutter Sound", url: "https://github.com/Din-27/flutter-snd" },
+      { label: "Loyalty App Repo", url: "https://github.com/Din-27/loyalty-app" },
     ],
   },
 ];

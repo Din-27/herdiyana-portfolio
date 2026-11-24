@@ -3,30 +3,47 @@
 import React, { useState } from "react";
 import { PROJECTS } from "@/data/portfolioData";
 import { Badge } from "@/components/ui/badge";
+import { ProjectThumbnail } from "@/components/ui/project-thumbnail";
 import { FolderGit2, ExternalLink, Github, Sparkles } from "lucide-react";
 
 export function ProjectsSection() {
   const [filter, setFilter] = useState<string>("Semua");
 
-  const categories = ["Semua", "Enterprise", "Backend & Microservices", "Open Source"];
+  const categories = [
+    "Semua",
+    "Enterprise",
+    "Backend & Microservices",
+    "Mobile App",
+    "Open Source & Tools",
+  ];
 
   const filteredProjects = PROJECTS.filter((proj) => {
     if (filter === "Semua") return true;
     if (filter === "Enterprise") {
       return (
         proj.badge.includes("Enterprise") ||
-        proj.tags.some((t) => ["PostgreSQL", "Next.js", "ERP"].includes(t))
+        proj.badge.includes("Point-of-Sale") ||
+        proj.tags.some((t) => ["PostgreSQL", "Next.js", "Docker"].includes(t))
       );
     }
     if (filter === "Backend & Microservices") {
       return (
         proj.tags.some((t) =>
-          ["Golang", "gRPC", "RabbitMQ", "Microservices", "Docker"].includes(t)
+          ["Golang", "NestJS", "Serverless", "REST API", "Docker"].includes(t)
         ) || proj.badge.includes("Microservices")
       );
     }
-    if (filter === "Open Source") {
-      return proj.badge.includes("Open Source") || proj.badge.includes("Community");
+    if (filter === "Mobile App") {
+      return proj.tags.some((t) =>
+        ["Flutter", "React Native", "Dart", "C++ Native"].includes(t)
+      );
+    }
+    if (filter === "Open Source & Tools") {
+      return (
+        proj.badge.includes("Open Source") ||
+        proj.badge.includes("Database Tool") ||
+        proj.tags.some((t) => ["NPM Registry", "Query Profiler"].includes(t))
+      );
     }
     return true;
   });
@@ -39,13 +56,13 @@ export function ProjectsSection() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
               <FolderGit2 className="h-4 w-4" />
-              <span>Portfolio Unggulan</span>
+              <span>Portfolio Unggulan & Repositori GitHub</span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tight">
               Proyek Nyata & Sistem Produksi
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
-              Solusi cloud point-of-sale, manajemen tugas skala enterprise, microservices Golang, bot otomatisasi, dan modul open-source.
+              Koleksi sistem enterprise, kasir POS cloud, microservices Golang/NestJS, dashboard telemetri IoT, mobile apps Flutter, dan library open-source di GitHub.
             </p>
           </div>
 
@@ -68,13 +85,22 @@ export function ProjectsSection() {
           </div>
         </div>
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        {/* Projects Grid with Web Mockup Thumbnails */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredProjects.map((proj, idx) => (
             <div
               key={idx}
-              className="flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-6 shadow-xs hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 hover:-translate-y-1 space-y-5 group"
+              className="flex flex-col justify-between rounded-2xl border border-border/60 bg-card p-5 sm:p-6 shadow-xs hover:border-emerald-500/40 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 space-y-5 group"
             >
+              {/* Web Browser Mockup Thumbnail */}
+              <ProjectThumbnail
+                title={proj.title}
+                domain={proj.domain}
+                mockupType={proj.mockupType}
+                badge={proj.badge}
+              />
+
+              {/* Project Details */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Badge
@@ -98,22 +124,22 @@ export function ProjectsSection() {
                 </p>
               </div>
 
-              <div className="space-y-4 pt-4 border-t border-border/50">
-                {/* Tech Tags */}
+              {/* Tech Tags & Action Links */}
+              <div className="space-y-4 pt-3 border-t border-border/50">
                 <div className="flex flex-wrap gap-1.5">
                   {proj.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground group-hover:border-border/60 transition-colors"
+                      className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
 
-                {/* Links */}
+                {/* Direct GitHub & Live Links */}
                 {proj.links && (
-                  <div className="flex items-center gap-2 pt-1">
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
                     {proj.links.map((link) => (
                       <a
                         key={link.label}
@@ -122,7 +148,7 @@ export function ProjectsSection() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3.5 py-1.5 text-xs font-bold text-foreground hover:bg-muted/80 hover:border-foreground/30 transition-all active:scale-95"
                       >
-                        {link.label === "GitHub" ? (
+                        {link.label.includes("Repo") || link.label === "GitHub" ? (
                           <Github className="h-3.5 w-3.5 text-muted-foreground" />
                         ) : (
                           <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />

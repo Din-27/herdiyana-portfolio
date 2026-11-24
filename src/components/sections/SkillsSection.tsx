@@ -2,7 +2,15 @@
 
 import React from "react";
 import { SKILLS } from "@/data/portfolioData";
-import { Wrench, Layout, Server, Database, Cloud } from "lucide-react";
+import {
+  Wrench,
+  Layout,
+  Smartphone,
+  Server,
+  Database,
+  Cloud,
+  Sparkles,
+} from "lucide-react";
 
 export function SkillsSection() {
   const skillCategories = [
@@ -10,29 +18,41 @@ export function SkillsSection() {
       title: "Frontend Engineering",
       icon: Layout,
       skills: SKILLS.frontend,
-      description: "Responsive web apps, mobile cross-platform, state management, and modern CSS frameworks.",
-      color: "emerald",
+      description:
+        "Modern reactive web applications, component-driven design, state management, and responsive CSS frameworks.",
+      accent: "text-emerald-500 bg-emerald-500/10 border-emerald-500/30",
+    },
+    {
+      title: "Mobile Native & Cross-Platform",
+      icon: Smartphone,
+      skills: SKILLS.mobile,
+      description:
+        "Flutter (Dart), React Native, native Android (Kotlin) & iOS (Swift), serta integrasi audio low-level C++ Native.",
+      accent: "text-teal-500 bg-teal-500/10 border-teal-500/30",
     },
     {
       title: "Backend & Microservices",
       icon: Server,
       skills: SKILLS.backend,
-      description: "High-throughput REST APIs, gRPC services, WebSocket event streams, message queues, and smart contracts.",
-      color: "blue",
+      description:
+        "High-throughput REST APIs, Golang (Gin), NestJS, Python FastAPI, gRPC inter-service communication, dan message queues.",
+      accent: "text-blue-500 bg-blue-500/10 border-blue-500/30",
     },
     {
-      title: "Databases, ORM & Caching",
+      title: "Databases, Tuning & Caching",
       icon: Database,
       skills: SKILLS.databases,
-      description: "Relational database schema design, index structure tuning, high-volume transactions, and in-memory caches.",
-      color: "amber",
+      description:
+        "PostgreSQL, MySQL, PLpgSQL functions, deep EXPLAIN ANALYZE index tuning, dan Redis multi-tier caching.",
+      accent: "text-amber-500 bg-amber-500/10 border-amber-500/30",
     },
     {
-      title: "Cloud, DevOps & Testing",
+      title: "Cloud, DevOps & Automation",
       icon: Cloud,
       skills: SKILLS.cloudDevops,
-      description: "GCP cloud deployments, AWS S3 storage, Linux server administration, Docker containers, and E2E testing.",
-      color: "purple",
+      description:
+        "Docker containerization, Google Cloud (GCP), AWS S3, serverless compute, Linux server administration, dan Playwright E2E.",
+      accent: "text-purple-500 bg-purple-500/10 border-purple-500/30",
     },
   ];
 
@@ -46,10 +66,10 @@ export function SkillsSection() {
             <span>Keahlian & Kemampuan Teknis</span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tight">
-            Teknologi & Stack Produksi
+            Teknologi & Stack Produksi (Verified via GitHub)
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl leading-relaxed">
-            Kombinasi teknologi modern yang digunakan secara harian dalam proyek enterprise dan aplikasi web/mobile berskala tinggi.
+            Kombinasi teknologi modern yang digunakan secara aktif dalam proyek enterprise di PT. MDEV (Astra Otoparts Group) dan repositori open-source GitHub.
           </p>
         </div>
 
@@ -57,13 +77,19 @@ export function SkillsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
           {skillCategories.map((cat, idx) => {
             const Icon = cat.icon;
+            const isFullWidth = idx === skillCategories.length - 1;
+
             return (
               <div
                 key={idx}
-                className="group rounded-2xl border border-border/60 bg-card p-6 shadow-xs hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 hover:-translate-y-1 space-y-4"
+                className={`group rounded-2xl border border-border/60 bg-card p-6 shadow-xs hover:border-emerald-500/40 hover:shadow-md transition-all duration-200 hover:-translate-y-1 space-y-4 ${
+                  isFullWidth ? "md:col-span-2" : ""
+                }`}
               >
                 <div className="flex items-start gap-3.5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 font-bold group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all">
+                  <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${cat.accent} font-bold group-hover:scale-110 transition-transform`}
+                  >
                     <Icon className="h-5 w-5" />
                   </div>
                   <div>
