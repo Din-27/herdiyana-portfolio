@@ -21,6 +21,7 @@ export function Navbar() {
 
   const navLinks = [
     { label: "Tentang", href: "#about" },
+    { label: "Simulator", href: "#live-telemetry" },
     { label: "Arsitektur", href: "#architecture-showcase" },
     { label: "Pengalaman", href: "#experience" },
     { label: "Proyek", href: "#projects" },

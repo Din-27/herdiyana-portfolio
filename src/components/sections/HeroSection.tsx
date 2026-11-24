@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { PERSONAL_INFO, METRICS } from "@/data/portfolioData";
+import { HolographicBadge } from "@/components/ui/holographic-badge";
 import {
   ExternalLink,
   Github,
@@ -103,107 +104,114 @@ export function HeroSection() {
           </span>
         </div>
 
-        {/* Main Headline & Animated Typewriter Role */}
-        <div className="space-y-4 max-w-4xl animate-fade-in-up">
-          <div className="space-y-1">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Fullstack & Software Engineering</span>
-            </span>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-[1.1]">
-              Herdiyana Firmansyah
-            </h1>
-          </div>
-
-          {/* Animated Dynamic Role Subtitle */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-base sm:text-xl md:text-2xl font-bold min-h-[2.5rem]">
-            <div className="flex items-center gap-2 text-foreground font-mono">
-              <Code2 className="h-5 w-5 text-emerald-500 shrink-0" />
-              <span className="text-emerald-600 dark:text-emerald-400">
-                {displayText}
+        {/* Main Headline & Animated Typewriter Role (Responsive 2-Col with 3D Holographic Badge) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-fade-in-up">
+          <div className="space-y-4 lg:col-span-7">
+            <div className="space-y-1">
+              <span className="text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Fullstack & Software Engineering</span>
               </span>
-              <span className="animate-pulse text-emerald-500 font-normal">|</span>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-6xl font-black tracking-tight text-foreground leading-[1.1]">
+                Herdiyana Firmansyah
+              </h1>
+            </div>
+
+            {/* Animated Dynamic Role Subtitle */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-base sm:text-xl md:text-2xl font-bold min-h-[2.5rem]">
+              <div className="flex items-center gap-2 text-foreground font-mono">
+                <Code2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                <span className="text-emerald-600 dark:text-emerald-400">
+                  {displayText}
+                </span>
+                <span className="animate-pulse text-emerald-500 font-normal">|</span>
+              </div>
+            </div>
+
+            {/* Company Affiliation Banner */}
+            <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-foreground bg-card/80 border border-border/70 px-3.5 py-1.5 rounded-xl shadow-2xs backdrop-blur-xs">
+              <Building2 className="h-4 w-4 text-emerald-500" />
+              <span className="text-muted-foreground">Aktif bekerja di:</span>
+              <strong className="text-foreground font-bold">PT. MDEV (Astra Otoparts Group)</strong>
+            </div>
+
+            {/* Professional Summary */}
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl pt-1">
+              {PERSONAL_INFO.summary}
+            </p>
+
+            {/* Interactive Floating Quick-Tech Chips */}
+            <div className="pt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mr-1">
+                Tech Radar:
+              </span>
+              {QUICK_STACK.map((tech) => (
+                <span
+                  key={tech.name}
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-lg border border-border/60 bg-card/60 text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xs cursor-default ${tech.color}`}
+                >
+                  {tech.name}
+                </span>
+              ))}
+            </div>
+
+            {/* Action Buttons & Social Links */}
+            <div className="flex flex-wrap items-center gap-3 pt-3">
+              <a
+                href="#contact"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-6 py-3 shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 transition-all duration-200 active:scale-95 group"
+              >
+                <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <span>Kirim Pesan</span>
+              </a>
+
+              <a
+                href="#projects"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-card border border-border hover:border-foreground/30 text-foreground font-bold text-xs sm:text-sm px-6 py-3 shadow-xs hover:bg-muted/70 transition-all duration-200 active:scale-95"
+              >
+                <FolderGit2 className="h-4 w-4 text-emerald-500" />
+                <span>Lihat Proyek</span>
+              </a>
+
+              {/* Social Icons */}
+              <div className="flex items-center gap-2 sm:pl-2">
+                <a
+                  href={PERSONAL_INFO.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-11 w-11 rounded-xl border border-border/80 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/50 transition-all duration-200 hover:-translate-y-0.5"
+                  title="GitHub Profile"
+                  aria-label="GitHub Profile"
+                >
+                  <Github className="h-4 w-4" />
+                </a>
+                <a
+                  href={PERSONAL_INFO.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-11 w-11 rounded-xl border border-border/80 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/50 transition-all duration-200 hover:-translate-y-0.5"
+                  title="LinkedIn Profile"
+                  aria-label="LinkedIn Profile"
+                >
+                  <Linkedin className="h-4 w-4" />
+                </a>
+                <a
+                  href={PERSONAL_INFO.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-11 w-11 rounded-xl border border-border/80 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/50 transition-all duration-200 hover:-translate-y-0.5"
+                  title="Portfolio Website"
+                  aria-label="Portfolio Website"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Company Affiliation Banner */}
-          <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-foreground bg-card/80 border border-border/70 px-3.5 py-1.5 rounded-xl shadow-2xs backdrop-blur-xs">
-            <Building2 className="h-4 w-4 text-emerald-500" />
-            <span className="text-muted-foreground">Aktif bekerja di:</span>
-            <strong className="text-foreground font-bold">PT. MDEV (Astra Otoparts Group)</strong>
-          </div>
-
-          {/* Professional Summary */}
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl pt-1">
-            {PERSONAL_INFO.summary}
-          </p>
-
-          {/* Interactive Floating Quick-Tech Chips */}
-          <div className="pt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mr-1">
-              Tech Radar:
-            </span>
-            {QUICK_STACK.map((tech) => (
-              <span
-                key={tech.name}
-                className={`text-xs font-semibold px-2.5 py-1 rounded-lg border border-border/60 bg-card/60 text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xs cursor-default ${tech.color}`}
-              >
-                {tech.name}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Buttons & Social Links */}
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <a
-            href="#contact"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm px-6 py-3 shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 transition-all duration-200 active:scale-95 group"
-          >
-            <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            <span>Kirim Pesan</span>
-          </a>
-
-          <a
-            href="#projects"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-card border border-border hover:border-foreground/30 text-foreground font-bold text-xs sm:text-sm px-6 py-3 shadow-xs hover:bg-muted/70 transition-all duration-200 active:scale-95"
-          >
-            <FolderGit2 className="h-4 w-4 text-emerald-500" />
-            <span>Lihat Proyek</span>
-          </a>
-
-          {/* Social Icons */}
-          <div className="flex items-center gap-2 sm:pl-2">
-            <a
-              href={PERSONAL_INFO.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="h-11 w-11 rounded-xl border border-border/80 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/50 transition-all duration-200 hover:-translate-y-0.5"
-              title="GitHub Profile"
-              aria-label="GitHub Profile"
-            >
-              <Github className="h-4 w-4" />
-            </a>
-            <a
-              href={PERSONAL_INFO.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="h-11 w-11 rounded-xl border border-border/80 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/50 transition-all duration-200 hover:-translate-y-0.5"
-              title="LinkedIn Profile"
-              aria-label="LinkedIn Profile"
-            >
-              <Linkedin className="h-4 w-4" />
-            </a>
-            <a
-              href={PERSONAL_INFO.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="h-11 w-11 rounded-xl border border-border/80 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/50 transition-all duration-200 hover:-translate-y-0.5"
-              title="Portfolio Website"
-              aria-label="Portfolio Website"
-            >
-              <ExternalLink className="h-4 w-4" />
-            </a>
+          {/* 3D Holographic Card on the right */}
+          <div className="lg:col-span-5 flex justify-center">
+            <HolographicBadge />
           </div>
         </div>
 

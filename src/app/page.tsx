@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { LiveSystemVisualizer } from "@/components/sections/LiveSystemVisualizer";
 import { ParallaxShowcaseSection } from "@/components/sections/ParallaxShowcaseSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
@@ -15,6 +16,7 @@ export default function HomePage() {
       <Navbar />
       <main className="flex-1">
         <HeroSection />
+        <LiveSystemVisualizer />
         <ParallaxShowcaseSection />
         <ExperienceSection />
         <ProjectsSection />
